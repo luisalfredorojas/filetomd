@@ -34,13 +34,10 @@ if not exist ".venv" (
   echo ==^> Entorno listo.
 )
 
-REM 3) Abrir el navegador
-if "%PORT%"=="" set "PORT=5000"
-start "" "http://127.0.0.1:%PORT%"
-
-REM 4) Levantar la app
+REM 3) Levantar la app
+REM La propia app elige un puerto libre y abre el navegador en la URL correcta.
 echo.
-echo ==^> Abriendo http://127.0.0.1:%PORT%
+echo ==^> Iniciando la app... se abrira tu navegador en unos segundos.
 echo     Para detener la app: cierra esta ventana o pulsa Ctrl+C.
 echo.
 ".venv\Scripts\python.exe" app.py

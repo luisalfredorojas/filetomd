@@ -69,8 +69,12 @@ Entra en la carpeta `filetomd-main` y:
 
 ### 🌐 Paso 3 — Usa la app
 
-Tu navegador se abre solo en **http://127.0.0.1:5000**. Si no se abre solo,
-escribe esa dirección en tu navegador.
+Tu navegador **se abre solo** con la app lista. La dirección será
+**http://127.0.0.1:5000** (o el siguiente puerto libre, p. ej. `:5001`, si el
+5000 está ocupado — algo común en Mac por el "Receptor de AirPlay").
+
+Si no se abriera solo, mira la **dirección exacta** que aparece en la ventana
+negra (línea *"Abre: http://127.0.0.1:…"*) y escríbela en tu navegador.
 
 ➡️ **Para cerrar la app:** simplemente cierra la ventana negra (Terminal) que se
 abrió, o pulsa `Ctrl + C` dentro de ella.
@@ -91,7 +95,10 @@ abrió, o pulsa `Ctrl + C` dentro de ella.
 
 ## La app se abre en
 
-### 👉 http://127.0.0.1:5000
+### 👉 http://127.0.0.1:5000  (o el siguiente puerto libre)
+
+> La app elige automáticamente un puerto libre y abre el navegador en él. En Mac
+> normalmente será `:5001`, porque el `:5000` lo ocupa el Receptor de AirPlay.
 
 ---
 
@@ -208,11 +215,12 @@ filetomd/
   MAX_FILE_SIZE_MB=100 ./start.sh
   ```
 
-- **Puerto**: 5000 por defecto. Cámbialo con `PORT` (útil si el 5000 está
-  ocupado; en macOS lo usa a veces AirPlay):
+- **Puerto**: la app **elige sola** un puerto libre (empezando por el 5000 y
+  subiendo) y abre el navegador en él, así que normalmente no tienes que hacer
+  nada. Si quieres forzar uno concreto, usa `PORT`:
 
   ```bash
-  PORT=5050 ./start.sh
+  PORT=8080 ./start.sh
   ```
 
 - **Limpieza**: los archivos temporales en `uploads/` se eliminan tras convertir.
@@ -235,8 +243,13 @@ TIFF, WEBP).
 
 ## Solución de problemas
 
-- **No abre el navegador solo** → abre manualmente http://127.0.0.1:5000.
-- **El puerto 5000 está ocupado** → arranca con otro puerto: `PORT=5050 ./start.sh`.
+- **Sale "Access to 127.0.0.1 was denied / HTTP ERROR 403"** → es el "Receptor
+  de AirPlay" de macOS ocupando el puerto 5000. La app ya lo evita sola usando
+  otro puerto; mira en la ventana negra la línea *"Abre: http://127.0.0.1:…"* y
+  usa esa dirección. (También puedes desactivar el receptor en **Ajustes del
+  Sistema → General → AirDrop y Handoff → Receptor de AirPlay**.)
+- **No abre el navegador solo** → mira la dirección *"Abre: http://127.0.0.1:…"*
+  en la ventana negra y escríbela en tu navegador.
 - **Un PDF no genera texto** → puede ser un PDF escaneado (solo imágenes) sin
   capa de texto; no hay texto que extraer.
 - **macOS dice que "no pudo verificar que está libre de malware"** (botones

@@ -35,19 +35,11 @@ if [ ! -d ".venv" ]; then
   echo "==> Entorno listo."
 fi
 
-# 3) Abrir el navegador automáticamente ------------------------------------
-PORT="${PORT:-5000}"
-URL="http://127.0.0.1:${PORT}"
-(
-  sleep 2
-  if command -v open >/dev/null 2>&1; then open "$URL"
-  elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$URL"
-  fi
-) >/dev/null 2>&1 &
-
-# 4) Levantar la app --------------------------------------------------------
+# 3) Levantar la app --------------------------------------------------------
+# La propia app elige un puerto libre y abre el navegador en la URL correcta
+# (esto evita el choque con el "Receptor de AirPlay" de macOS en el puerto 5000).
 echo ""
-echo "==> Abriendo $URL"
+echo "==> Iniciando la app... se abrirá tu navegador en unos segundos."
 echo "    Para detener la app: cierra esta ventana o pulsa Ctrl+C."
 echo ""
 exec .venv/bin/python app.py

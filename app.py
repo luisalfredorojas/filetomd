@@ -9,7 +9,10 @@ Todo corre en local, offline, sin servicios en la nube.
 
 import os
 import re
+import socket
+import threading
 import unicodedata
+import webbrowser
 from pathlib import Path
 
 from flask import (
@@ -307,11 +310,48 @@ def too_large(_err):
     )
 
 
+def _port_is_free(port: int) -> bool:
+    """True si se puede escuchar en 127.0.0.1:<port> ahora mismo."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        try:
+            sock.bind(("127.0.0.1", port))
+            return True
+        except OSError:
+            return False
+
+
+def find_available_port(preferred: int) -> int:
+    """
+    Devuelve un puerto libre empezando por `preferred` y subiendo.
+
+    Esto evita el choque típico de macOS, donde el "Receptor de AirPlay" ocupa
+    el puerto 5000 y responde 403. Si el preferido está ocupado, se usa el
+    siguiente libre; como último recurso, deja que el sistema elija uno.
+    """
+    for port in [preferred] + [preferred + i for i in range(1, 50)]:
+        if _port_is_free(port):
+            return port
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        return sock.getsockname()[1]
+
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "5000"))
     debug = os.environ.get("FLASK_DEBUG", "").lower() in {"1", "true", "yes"}
+    preferred = int(os.environ.get("PORT", "5000"))
+    port = find_available_port(preferred)
+    url = f"http://127.0.0.1:{port}"
+
     print("\n  MarkItDown Converter")
     print(f"  Carpeta de salida: {OUTPUT_DIR.resolve()}")
-    print(f"  Abre: http://127.0.0.1:{port}\n")
-    # use_reloader=False para no abrir el navegador dos veces desde el lanzador.
+    if port != preferred:
+        print(f"  (El puerto {preferred} estaba ocupado; usando el {port}.)")
+    print(f"  Abre: {url}\n")
+
+    # La propia app abre el navegador en el puerto correcto (no el lanzador),
+    # así nunca se abre la URL equivocada. Desactivable con NO_BROWSER=1.
+    if os.environ.get("NO_BROWSER", "").lower() not in {"1", "true", "yes"}:
+        threading.Timer(1.2, lambda: webbrowser.open(url)).start()
+
+    # use_reloader=False para no arrancar dos procesos / abrir dos pestañas.
     app.run(host="127.0.0.1", port=port, debug=debug, use_reloader=False)
