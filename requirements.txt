@@ -1,0 +1,10 @@
+# Flask: servidor web local
+flask>=3.0,<4.0
+
+# markitdown con los conversores de documentos para uso 100% OFFLINE.
+# Se usan extras puntuales en lugar de [all] a propósito: [all] arrastra
+# dependencias de nube (Azure Document Intelligence / Content Understanding,
+# YouTube y transcripción de audio) que necesitan red o API keys y que esta
+# app local no usa. Estos extras cubren PDF, Word, PowerPoint y Excel; el
+# núcleo de markitdown ya maneja HTML, CSV, JSON, XML, TXT, imágenes y ZIP.
+markitdown[pdf,docx,pptx,xlsx,xls,outlook]>=0.1.6

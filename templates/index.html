@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MarkItDown Converter</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Cpath d='M16 7v12m0 0l-5-5m5 5l5-5M9 24h14' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <style>
+    /* Estilos EMBEBIDOS (única fuente de verdad). Van aquí para que la página
+       se vea correctamente incluso si se abre el HTML directamente, sin pasar
+       por el servidor Flask (p. ej. en un panel de previsualización). */
+    :root {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-2: #f1f3f5;
+      --border: #e2e6ea;
+      --border-strong: #cdd4da;
+      --text: #1c2024;
+      --text-muted: #6b7280;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eaf1ff;
+      --success: #16a34a;
+      --success-soft: #e7f6ec;
+      --danger: #dc2626;
+      --danger-soft: #fdeaea;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 16px rgba(16, 24, 40, 0.06);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: "SF Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 { margin: 0; font-weight: 650; letter-spacing: -0.01em; }
+
+    .app-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 24px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; max-width: 960px; margin: 0 auto; }
+
+    .brand-mark {
+      width: 42px; height: 42px;
+      display: grid; place-items: center;
+      background: var(--primary); color: #fff;
+      border-radius: 12px;
+      font-size: 22px; font-weight: 700;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+    }
+
+    .app-header h1 { font-size: 19px; }
+    .subtitle { margin: 2px 0 0; color: var(--text-muted); font-size: 13px; }
+
+    .container {
+      max-width: 960px;
+      margin: 24px auto 64px;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    /* Dropzone */
+    .dropzone {
+      border: 2px dashed var(--border-strong);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s ease, background .15s ease, transform .05s ease;
+      outline: none;
+    }
+    .dropzone:hover { border-color: var(--primary); background: var(--primary-soft); }
+    .dropzone:focus-visible { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+    .dropzone.dragover { border-color: var(--primary); background: var(--primary-soft); transform: scale(1.005); }
+
+    .dropzone-icon { font-size: 38px; }
+    .dropzone-title { margin: 10px 0 2px; font-weight: 600; font-size: 16px; }
+    .dropzone-hint { margin: 0; color: var(--text-muted); }
+    .dropzone .link { color: var(--primary); font-weight: 600; }
+    .dropzone-meta { margin: 10px 0 0; font-size: 12px; color: var(--text-muted); }
+
+    /* Selección */
+    .selection { margin-top: 18px; }
+    .selection-head, .results-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .selection-head h2, .results-head h2 { font-size: 15px; }
+
+    .file-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+    .file-item {
+      display: flex; align-items: center; gap: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      background: var(--surface);
+    }
+    .file-icon {
+      width: 38px; height: 38px; flex: none;
+      display: grid; place-items: center;
+      background: var(--surface-2);
+      border-radius: 9px;
+      font-size: 18px;
+    }
+    .file-meta { min-width: 0; flex: 1; }
+    .file-name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-sub { font-size: 12px; color: var(--text-muted); display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge { background: var(--surface-2); border-radius: 6px; padding: 1px 7px; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+
+    .file-actions { display: flex; gap: 6px; flex: none; flex-wrap: wrap; justify-content: flex-end; }
+
+    /* Estado por resultado */
+    .status-ok { color: var(--success); }
+    .status-fail { color: var(--danger); }
+    .result-error { font-size: 12px; color: var(--danger); margin-top: 2px; }
+    .result-path {
+      font-family: var(--mono); font-size: 11.5px; color: var(--text-muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* Botones */
+    .btn {
+      font-family: inherit; font-size: 13.5px; font-weight: 600;
+      border: 1px solid transparent; border-radius: 9px;
+      padding: 8px 14px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 7px;
+      transition: background .15s ease, border-color .15s ease, color .15s ease, opacity .15s;
+    }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+    .btn-ghost { background: transparent; color: var(--text-muted); border-color: transparent; }
+    .btn-ghost:hover { background: var(--surface-2); color: var(--text); }
+    .btn-soft { background: var(--surface-2); color: var(--text); }
+    .btn-soft:hover { background: var(--border); }
+    .btn-sm { padding: 6px 10px; font-size: 12.5px; }
+    .btn-danger { background: transparent; color: var(--danger); }
+    .btn-danger:hover { background: var(--danger-soft); }
+
+    .actions { margin-top: 16px; display: flex; justify-content: flex-end; }
+
+    /* Spinner */
+    .spinner {
+      width: 15px; height: 15px;
+      border: 2px solid rgba(255, 255, 255, .45);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Empty + alerts */
+    .empty-state { text-align: center; padding: 28px 12px; color: var(--text-muted); }
+    .empty-icon { font-size: 34px; }
+    .empty-state p { margin: 6px 0 0; }
+    .empty-hint { font-size: 13px; }
+    .empty-state code, .file-sub code { font-family: var(--mono); font-size: 12px; }
+
+    .alert { border-radius: var(--radius-sm); padding: 11px 14px; font-size: 13.5px; margin-top: 14px; }
+    .alert-error { background: var(--danger-soft); color: var(--danger); border: 1px solid #f3c9c9; }
+
+    /* Modal */
+    .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 24px; }
+    .modal-backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, .45); backdrop-filter: blur(2px); }
+    .modal-box {
+      position: relative;
+      background: var(--surface);
+      width: min(820px, 100%);
+      max-height: 86vh;
+      border-radius: var(--radius);
+      box-shadow: 0 24px 60px rgba(16, 24, 40, .28);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-head {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+    }
+    .modal-head h3 { font-size: 15px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .modal-tabs { display: flex; gap: 4px; background: var(--surface-2); border-radius: 9px; padding: 3px; }
+    .tab { border: none; background: transparent; font-family: inherit; font-size: 12.5px; font-weight: 600;
+           color: var(--text-muted); padding: 5px 11px; border-radius: 7px; cursor: pointer; }
+    .tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+    .modal-close { border: none; background: transparent; font-size: 16px; color: var(--text-muted); cursor: pointer; padding: 4px 8px; border-radius: 7px; }
+    .modal-close:hover { background: var(--surface-2); color: var(--text); }
+    .modal-path { font-family: var(--mono); font-size: 11.5px; color: var(--text-muted); padding: 8px 18px 0; margin: 0; word-break: break-all; }
+    .modal-body { padding: 18px; overflow: auto; }
+    .raw-view { background: var(--surface-2); border-radius: var(--radius-sm); padding: 14px; overflow: auto; }
+    .raw-view code { font-family: var(--mono); font-size: 12.5px; white-space: pre-wrap; word-break: break-word; }
+
+    /* Markdown render (ligero) */
+    .markdown-body { font-size: 14.5px; line-height: 1.65; }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 { margin: 1.2em 0 .5em; line-height: 1.25; }
+    .markdown-body h1 { font-size: 1.6em; border-bottom: 1px solid var(--border); padding-bottom: .25em; }
+    .markdown-body h2 { font-size: 1.3em; border-bottom: 1px solid var(--border); padding-bottom: .2em; }
+    .markdown-body h3 { font-size: 1.12em; }
+    .markdown-body p { margin: .6em 0; }
+    .markdown-body ul, .markdown-body ol { padding-left: 1.4em; margin: .6em 0; }
+    .markdown-body code { font-family: var(--mono); background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-size: .9em; }
+    .markdown-body pre { background: var(--surface-2); padding: 12px; border-radius: var(--radius-sm); overflow: auto; }
+    .markdown-body pre code { background: none; padding: 0; }
+    .markdown-body table { border-collapse: collapse; width: 100%; margin: .8em 0; font-size: .92em; }
+    .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
+    .markdown-body th { background: var(--surface-2); }
+    .markdown-body blockquote { border-left: 3px solid var(--border-strong); margin: .6em 0; padding: .2em 1em; color: var(--text-muted); }
+    .markdown-body a { color: var(--primary); }
+    .markdown-body hr { border: none; border-top: 1px solid var(--border); margin: 1.2em 0; }
+    .markdown-body img { max-width: 100%; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(10px);
+      background: #1f2937; color: #fff; padding: 10px 16px; border-radius: 10px;
+      font-size: 13.5px; box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      opacity: 0; transition: opacity .2s ease, transform .2s ease; z-index: 60; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.toast-error { background: var(--danger); }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 560px) {
+      .file-item { flex-wrap: wrap; }
+      .file-actions { width: 100%; justify-content: flex-start; }
+      .modal-head { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body data-max-mb="{{ max_file_size_mb }}">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">↓</div>
+      <div>
+        <h1>MarkItDown Converter</h1>
+        <p class="subtitle">Convierte PDF, Office, HTML, imágenes y más a Markdown · 100% local</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Zona de carga -->
+    <section class="card">
+      <div id="dropzone" class="dropzone" tabindex="0" role="button"
+           aria-label="Zona de carga de archivos">
+        <input id="file-input" type="file" multiple hidden />
+        <div class="dropzone-inner">
+          <div class="dropzone-icon" aria-hidden="true">📄</div>
+          <p class="dropzone-title">Arrastra archivos aquí</p>
+          <p class="dropzone-hint">o <span class="link">haz clic para seleccionar</span></p>
+          <p class="dropzone-meta">Máximo {{ max_file_size_mb }} MB por archivo</p>
+        </div>
+      </div>
+
+      <!-- Lista de seleccionados -->
+      <div id="selection" class="selection hidden">
+        <div class="selection-head">
+          <h2>Archivos seleccionados (<span id="sel-count">0</span>)</h2>
+          <button id="clear-btn" class="btn btn-ghost" type="button">Limpiar todo</button>
+        </div>
+        <ul id="selected-list" class="file-list"></ul>
+        <div class="actions">
+          <button id="convert-btn" class="btn btn-primary" type="button">
+            <span class="btn-label">Convertir</span>
+            <span class="spinner hidden" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Estado de error global -->
+      <div id="global-error" class="alert alert-error hidden" role="alert"></div>
+    </section>
+
+    <!-- Resultados / archivos generados -->
+    <section class="card">
+      <div class="results-head">
+        <h2>Archivos generados</h2>
+        <button id="refresh-btn" class="btn btn-ghost" type="button" title="Recargar lista">↻ Actualizar</button>
+      </div>
+      <div id="empty-results" class="empty-state">
+        <div class="empty-icon" aria-hidden="true">🗂️</div>
+        <p>Aún no hay archivos convertidos.</p>
+        <p class="empty-hint">Los <code>.md</code> que generes aparecerán aquí.</p>
+      </div>
+      <ul id="results-list" class="file-list"></ul>
+    </section>
+  </main>
+
+  <!-- Modal de previsualización -->
+  <div id="preview-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-box">
+      <header class="modal-head">
+        <h3 id="preview-title">Previsualización</h3>
+        <div class="modal-tabs">
+          <button class="tab active" data-view="rendered" type="button">Renderizado</button>
+          <button class="tab" data-view="raw" type="button">Texto</button>
+        </div>
+        <button class="modal-close" data-close type="button" aria-label="Cerrar">✕</button>
+      </header>
+      <p id="preview-path" class="modal-path"></p>
+      <div class="modal-body">
+        <div id="preview-rendered" class="markdown-body"></div>
+        <pre id="preview-raw" class="raw-view hidden"><code></code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
