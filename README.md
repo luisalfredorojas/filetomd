@@ -39,9 +39,24 @@ Entra en la carpeta `filetomd-main` y:
 - Se abrirá una ventana negra (Terminal) y, en unos segundos, tu navegador con
   la app lista. **No cierres la ventana negra mientras uses la app.**
 
-> ⚠️ Si Mac muestra *"no se puede abrir porque es de un desarrollador no
-> identificado"*: haz **clic derecho** sobre `start.command` → **Abrir** →
-> **Abrir**. Solo hay que hacerlo la primera vez.
+> ⚠️ **Muy probable la primera vez:** Mac muestra un aviso de que *"Apple no pudo
+> verificar que «start.command» esté libre de malware"*, con botones **"Mover a
+> la papelera"** y **"Listo"**. **Es normal** (el programa es seguro, pero no
+> está firmado con una cuenta de pago de Apple). Sigue estos pasos:
+>
+> 1. Pulsa **"Listo"** (❌ **NO** "Mover a la papelera").
+> 2. Abre **Ajustes del Sistema → Privacidad y seguridad**.
+> 3. Baja hasta la sección **Seguridad**. Verás un mensaje:
+>    *"Se bloqueó «start.command»…"* con un botón **"Abrir igualmente"**.
+>    Haz clic ahí y confirma con tu huella o contraseña.
+> 4. Vuelve a hacer **doble clic en `start.command`** → ahora aparece **"Abrir"**.
+>
+> Solo hay que hacer esto **una vez**.
+>
+> 💡 **Atajo para quien se anime con la Terminal:** abre la app **Terminal**,
+> escribe `xattr -dr com.apple.quarantine ` (con un espacio al final),
+> **arrastra la carpeta `filetomd-main`** a la ventana y pulsa **Enter**. Luego
+> el doble clic funcionará sin avisos.
 
 #### 🪟 En Windows
 
@@ -224,7 +239,11 @@ TIFF, WEBP).
 - **El puerto 5000 está ocupado** → arranca con otro puerto: `PORT=5050 ./start.sh`.
 - **Un PDF no genera texto** → puede ser un PDF escaneado (solo imágenes) sin
   capa de texto; no hay texto que extraer.
-- **macOS bloquea `start.command`** → clic derecho → **Abrir** (solo la 1ª vez).
+- **macOS dice que "no pudo verificar que está libre de malware"** (botones
+  *Mover a la papelera / Listo*) → pulsa **Listo**, ve a **Ajustes del Sistema →
+  Privacidad y seguridad**, baja y pulsa **"Abrir igualmente"**; luego vuelve a
+  abrir `start.command`. (Atajo en Terminal:
+  `xattr -dr com.apple.quarantine ~/Downloads/filetomd-main`). Solo la 1ª vez.
 
 ---
 
