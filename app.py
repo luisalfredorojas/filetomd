@@ -42,6 +42,11 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 MAX_FILE_SIZE_MB = int(os.environ.get("MAX_FILE_SIZE_MB", "50"))
 MAX_CONTENT_LENGTH = MAX_FILE_SIZE_MB * 1024 * 1024
 
+# Carpeta de salida "tal como se ve en tu máquina". En Docker, OUTPUT_DIR es una
+# ruta interna del contenedor (/app/output); con esta variable mostramos en la
+# interfaz la ruta real del host donde están los .md (la carpeta montada).
+DISPLAY_OUTPUT_DIR = os.environ.get("DISPLAY_OUTPUT_DIR", "").strip()
+
 # Extensiones soportadas (offline) por la configuración instalada de markitdown.
 # Documentos vía extras [pdf,docx,pptx,xlsx,xls,outlook]; el resto lo maneja
 # el núcleo de markitdown. No se incluye audio (la transcripción requiere red).
@@ -85,6 +90,17 @@ _md = MarkItDown(enable_plugins=False)
 # --------------------------------------------------------------------------- #
 # Utilidades
 # --------------------------------------------------------------------------- #
+
+def display_path(path: Path) -> str:
+    """
+    Ruta a mostrar en la interfaz. Normalmente la ruta absoluta real; si se
+    define DISPLAY_OUTPUT_DIR (caso Docker), se traduce a la carpeta del host.
+    """
+    if DISPLAY_OUTPUT_DIR:
+        sep = "\\" if "\\" in DISPLAY_OUTPUT_DIR else "/"
+        return f"{DISPLAY_OUTPUT_DIR.rstrip('/').rstrip(chr(92))}{sep}{path.name}"
+    return str(path.resolve())
+
 
 def human_size(num_bytes: int) -> str:
     """Devuelve un tamaño legible (B, KB, MB, GB)."""
@@ -169,7 +185,7 @@ def list_output_files() -> list[dict]:
         files.append(
             {
                 "nombre_md": path.name,
-                "ruta_absoluta": str(path.resolve()),
+                "ruta_absoluta": display_path(path),
                 "tamano": human_size(stat.st_size),
                 "modificado": stat.st_mtime,
             }
@@ -242,7 +258,7 @@ def convert():
             out_path.write_text(markdown_text, encoding="utf-8")
 
             entry["nombre_md"] = out_path.name
-            entry["ruta_absoluta"] = str(out_path.resolve())
+            entry["ruta_absoluta"] = display_path(out_path)
             entry["ok"] = True
         except Exception as exc:  # noqa: BLE001 — un fallo no debe romper el lote
             entry["error"] = _friendly_error(exc)
@@ -291,7 +307,7 @@ def preview(filename):
     return jsonify(
         {
             "nombre_md": target.name,
-            "ruta_absoluta": str(target.resolve()),
+            "ruta_absoluta": display_path(target),
             "contenido": content,
         }
     )
@@ -338,20 +354,30 @@ def find_available_port(preferred: int) -> int:
 
 if __name__ == "__main__":
     debug = os.environ.get("FLASK_DEBUG", "").lower() in {"1", "true", "yes"}
+
+    # HOST: 127.0.0.1 en local (solo tu máquina); 0.0.0.0 dentro de Docker para
+    # que el puerto publicado sea accesible (se sigue publicando solo en local).
+    host = os.environ.get("HOST", "127.0.0.1")
+
+    # En Docker el puerto interno es fijo (5000, siempre libre); en local se
+    # busca uno libre para esquivar el Receptor de AirPlay de macOS.
     preferred = int(os.environ.get("PORT", "5000"))
-    port = find_available_port(preferred)
-    url = f"http://127.0.0.1:{port}"
+    port = preferred if host == "0.0.0.0" else find_available_port(preferred)
+
+    display_host = "127.0.0.1" if host in ("0.0.0.0", "") else host
+    url = f"http://{display_host}:{port}"
 
     print("\n  MarkItDown Converter")
-    print(f"  Carpeta de salida: {OUTPUT_DIR.resolve()}")
+    print(f"  Carpeta de salida: {DISPLAY_OUTPUT_DIR or OUTPUT_DIR.resolve()}")
     if port != preferred:
         print(f"  (El puerto {preferred} estaba ocupado; usando el {port}.)")
     print(f"  Abre: {url}\n")
 
     # La propia app abre el navegador en el puerto correcto (no el lanzador),
-    # así nunca se abre la URL equivocada. Desactivable con NO_BROWSER=1.
+    # así nunca se abre la URL equivocada. Desactivable con NO_BROWSER=1
+    # (en Docker no hay navegador: lo abre el lanzador del host).
     if os.environ.get("NO_BROWSER", "").lower() not in {"1", "true", "yes"}:
         threading.Timer(1.2, lambda: webbrowser.open(url)).start()
 
     # use_reloader=False para no arrancar dos procesos / abrir dos pestañas.
-    app.run(host="127.0.0.1", port=port, debug=debug, use_reloader=False)
+    app.run(host=host, port=port, debug=debug, use_reloader=False)

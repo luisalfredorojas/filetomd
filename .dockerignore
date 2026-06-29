@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+.python-version
+output/*
+uploads/*
+!output/.gitkeep
+!uploads/.gitkeep
+*.png
+.DS_Store
+README.md

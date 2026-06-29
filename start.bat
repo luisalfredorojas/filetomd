@@ -1,45 +1,55 @@
 @echo off
 REM ============================================================
-REM   Lanzador de MarkItDown Converter para Windows.
-REM   No necesitas tener Python instalado: usa "uv", que descarga
-REM   Python y las dependencias automaticamente la primera vez.
+REM   Lanzador de MarkItDown Converter (Docker) para Windows.
+REM   Requiere tener instalado "Docker Desktop".
 REM ============================================================
 setlocal enableextensions
 cd /d "%~dp0"
 
 echo.
 echo   ===========================================
-echo          MarkItDown Converter
+echo        MarkItDown Converter  (Docker)
 echo   ===========================================
 echo.
 
-REM 1) Asegurar que 'uv' esta disponible
-set "UV=uv"
-where uv >nul 2>nul
+REM 1) Docker instalado?
+where docker >nul 2>nul
 if errorlevel 1 (
-  if exist "%USERPROFILE%\.local\bin\uv.exe" (
-    set "UV=%USERPROFILE%\.local\bin\uv.exe"
-  ) else (
-    echo ==^> Instalando 'uv' ^(descarga Python y dependencias por ti^)...
-    powershell -ExecutionPolicy ByPass -Command "irm https://astral.sh/uv/install.ps1 | iex"
-    set "UV=%USERPROFILE%\.local\bin\uv.exe"
-  )
+  echo No encuentro Docker en tu sistema.
+  echo.
+  echo Instala "Docker Desktop" ^(gratis^) desde:
+  echo     https://www.docker.com/products/docker-desktop/
+  echo Abrelo, espera a que aparezca como "running" y vuelve a ejecutar este archivo.
+  echo.
+  pause
+  exit /b 1
 )
 
-REM 2) Preparar el entorno la primera vez
-if not exist ".venv" (
-  echo ==^> Preparando el entorno por primera vez ^(puede tardar 1-2 minutos^)...
-  "%UV%" venv --python 3.13 .venv
-  "%UV%" pip install --python .venv -r requirements.txt
-  echo ==^> Entorno listo.
+REM 2) Motor de Docker activo?
+docker info >nul 2>nul
+if errorlevel 1 (
+  echo ==^> Docker no esta activo.
+  echo     Abre "Docker Desktop", espera a que diga "running" y vuelve a
+  echo     ejecutar este archivo.
+  echo.
+  pause
+  exit /b 1
 )
 
-REM 3) Levantar la app
-REM La propia app elige un puerto libre y abre el navegador en la URL correcta.
+REM 3) Carpeta de salida y puerto
+if "%HOST_PORT%"=="" set "HOST_PORT=5001"
+set "DISPLAY_OUTPUT_DIR=%cd%\output"
+if not exist "output" mkdir output
+
+REM 4) Construir la imagen
+echo ==^> Preparando la app ^(la primera vez puede tardar unos minutos^)...
+docker compose build
+
+REM 5) Abrir el navegador y levantar
+start "" "http://127.0.0.1:%HOST_PORT%"
 echo.
-echo ==^> Iniciando la app... se abrira tu navegador en unos segundos.
+echo ==^> Abriendo http://127.0.0.1:%HOST_PORT%
+echo     Tus archivos .md apareceran en: %DISPLAY_OUTPUT_DIR%
 echo     Para detener la app: cierra esta ventana o pulsa Ctrl+C.
 echo.
-".venv\Scripts\python.exe" app.py
-
-pause
+docker compose up

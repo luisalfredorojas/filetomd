@@ -9,96 +9,70 @@ La conversión la hace siempre `markitdown` — esta app solo le pone una interf
 amigable: arrastrar y soltar, lista de selección, conversión por lotes,
 previsualización y descarga.
 
-![offline](https://img.shields.io/badge/offline-100%25-success) ![sin-python](https://img.shields.io/badge/no%20necesitas%20Python-✓-blue) ![flask](https://img.shields.io/badge/flask-3.x-black)
+Se ejecuta dentro de **Docker**, así que no tienes que instalar ni configurar
+Python: todo va empaquetado y funciona igual en cualquier computadora.
+
+![offline](https://img.shields.io/badge/offline-100%25-success) ![docker](https://img.shields.io/badge/Docker-listo-2496ed) ![python](https://img.shields.io/badge/python-3.13-blue)
 
 ---
 
-## 🟢 Guía para personas NO técnicas (paso a paso)
+## 🟢 Guía paso a paso (para cualquier persona)
 
-> No necesitas saber programar **ni tener Python instalado**. Solo seguir estos
-> 3 pasos. La primera vez tarda 1–2 minutos (descarga lo necesario); después
-> abre en segundos.
+Solo necesitas **una cosa instalada**: Docker Desktop (es gratis). Lo demás es
+automático.
 
-### 📥 Paso 1 — Descarga el proyecto a tu computadora
+### 📦 Paso 1 — Instala Docker Desktop (solo una vez)
 
-1. Abre esta página en tu navegador:
-   **https://github.com/luisalfredorojas/filetomd**
-2. Haz clic en el botón verde **`< > Code`** (arriba a la derecha).
-3. En el menú que aparece, haz clic en **`Download ZIP`**.
-4. Ve a tu carpeta de **Descargas** y **haz doble clic en el ZIP** para
-   descomprimirlo. Te quedará una carpeta llamada **`filetomd-main`**.
-5. (Recomendado) Muévela a un lugar cómodo, por ejemplo tu **Escritorio**.
+1. Entra a **https://www.docker.com/products/docker-desktop/**
+2. Descarga la versión para tu sistema (**Mac** o **Windows**) e instálala como
+   cualquier programa.
+3. **Abre Docker Desktop** y espera a que el ícono de la ballena 🐳 deje de
+   moverse / diga **"running"** (en marcha). Déjalo abierto.
 
-### ▶️ Paso 2 — Abre la aplicación
+> 💡 Docker es como una "caja" donde la app trae todo lo que necesita para
+> funcionar. Lo instalas una vez y sirve para siempre.
+
+### 📥 Paso 2 — Descarga este proyecto
+
+1. Abre **https://github.com/luisalfredorojas/filetomd**
+2. Botón verde **`< > Code`** → **`Download ZIP`**.
+3. En tu carpeta de **Descargas**, **haz doble clic en el ZIP** para
+   descomprimirlo. Tendrás una carpeta llamada **`filetomd-main`**.
+
+### ▶️ Paso 3 — Abre la aplicación
 
 Entra en la carpeta `filetomd-main` y:
 
-#### 🍎 En Mac
+- 🍎 **En Mac:** haz doble clic en **`start.command`**.
+- 🪟 **En Windows:** haz doble clic en **`start.bat`**.
 
-- **Haz doble clic en `start.command`**.
-- Se abrirá una ventana negra (Terminal) y, en unos segundos, tu navegador con
-  la app lista. **No cierres la ventana negra mientras uses la app.**
+Se abrirá una ventana negra. **La primera vez tarda unos minutos** (Docker
+prepara la app); las siguientes veces abre en segundos. Cuando esté lista, tu
+navegador se abre solo con la app. **No cierres la ventana negra mientras la
+uses.**
 
-> ⚠️ **Muy probable la primera vez:** Mac muestra un aviso de que *"Apple no pudo
-> verificar que «start.command» esté libre de malware"*, con botones **"Mover a
-> la papelera"** y **"Listo"**. **Es normal** (el programa es seguro, pero no
-> está firmado con una cuenta de pago de Apple). Sigue estos pasos:
+> ⚠️ **Mac, la primera vez** puede mostrar *"Apple no pudo verificar que
+> «start.command» esté libre de malware"* (botones *Mover a la papelera / Listo*).
+> Es normal. Pulsa **"Listo"**, ve a **Ajustes del Sistema → Privacidad y
+> seguridad**, baja y pulsa **"Abrir igualmente"**, y vuelve a abrir
+> `start.command`. (Solo la primera vez.)
 >
-> 1. Pulsa **"Listo"** (❌ **NO** "Mover a la papelera").
-> 2. Abre **Ajustes del Sistema → Privacidad y seguridad**.
-> 3. Baja hasta la sección **Seguridad**. Verás un mensaje:
->    *"Se bloqueó «start.command»…"* con un botón **"Abrir igualmente"**.
->    Haz clic ahí y confirma con tu huella o contraseña.
-> 4. Vuelve a hacer **doble clic en `start.command`** → ahora aparece **"Abrir"**.
->
-> Solo hay que hacer esto **una vez**.
->
-> 💡 **Atajo para quien se anime con la Terminal:** abre la app **Terminal**,
-> escribe `xattr -dr com.apple.quarantine ` (con un espacio al final),
-> **arrastra la carpeta `filetomd-main`** a la ventana y pulsa **Enter**. Luego
-> el doble clic funcionará sin avisos.
+> ⚠️ **Windows, la primera vez** puede salir *"Windows protegió tu PC"* → **Más
+> información** → **Ejecutar de todas formas**.
 
-#### 🪟 En Windows
+### 🌐 Paso 4 — Usa la app
 
-- **Haz doble clic en `start.bat`**.
-- Se abrirá una ventana y, en unos segundos, tu navegador con la app.
-- **No cierres esa ventana mientras uses la app.**
+Tu navegador se abre solo en **http://127.0.0.1:5001** (o el siguiente puerto
+libre). Si no se abriera, mira en la ventana negra la línea
+*"Abriendo http://127.0.0.1:…"* y escribe esa dirección en tu navegador.
 
-> ⚠️ Si Windows muestra una pantalla azul *"Windows protegió tu PC"*: haz clic
-> en **Más información** → **Ejecutar de todas formas**. Solo la primera vez.
-
-### 🌐 Paso 3 — Usa la app
-
-Tu navegador **se abre solo** con la app lista. La dirección será
-**http://127.0.0.1:5000** (o el siguiente puerto libre, p. ej. `:5001`, si el
-5000 está ocupado — algo común en Mac por el "Receptor de AirPlay").
-
-Si no se abriera solo, mira la **dirección exacta** que aparece en la ventana
-negra (línea *"Abre: http://127.0.0.1:…"*) y escríbela en tu navegador.
-
-➡️ **Para cerrar la app:** simplemente cierra la ventana negra (Terminal) que se
-abrió, o pulsa `Ctrl + C` dentro de ella.
+➡️ **Para cerrar la app:** cierra la ventana negra o pulsa `Ctrl + C` en ella.
 
 ---
 
-> 🔒 **¿Es seguro?** Sí. Todo ocurre **dentro de tu computadora**. Tus archivos
-> no se suben a internet ni se envían a ningún servidor. No necesita cuenta ni
-> contraseñas.
->
-> 🔧 **¿Cómo funciona por dentro?** El lanzador usa
-> [`uv`](https://docs.astral.sh/uv/), una herramienta ligera que descarga el
-> Python correcto e instala todo lo necesario **dentro de la propia carpeta del
-> proyecto** (no ensucia tu sistema). Si no tienes `uv`, el lanzador lo instala
-> solo automáticamente.
-
----
-
-## La app se abre en
-
-### 👉 http://127.0.0.1:5000  (o el siguiente puerto libre)
-
-> La app elige automáticamente un puerto libre y abre el navegador en él. En Mac
-> normalmente será `:5001`, porque el `:5000` lo ocupa el Receptor de AirPlay.
+> 🔒 **¿Es seguro / privado?** Sí. Todo ocurre **dentro de tu computadora**: la
+> app solo escucha en `127.0.0.1` (tu propia máquina), no se expone a la red ni
+> a internet. Tus archivos no se suben a ningún servidor.
 
 ---
 
@@ -111,44 +85,48 @@ abrió, o pulsa `Ctrl + C` dentro de ella.
 3. Pulsa **Convertir**. Verás un spinner mientras se procesan.
 4. En **Archivos generados** aparece cada `.md` con:
    - Su **nombre**.
-   - La **ruta absoluta** en disco (botón **Copiar ruta**).
+   - La **ruta** donde quedó guardado en tu máquina (botón **Copiar ruta**).
    - **Descargar** el `.md`.
    - **Ver**: abre una previsualización (renderizada o texto plano).
-5. El listado **persiste**: al recargar la página se leen los `.md` que ya
-   existen en `output/`.
+5. Los `.md` que generes quedan en la carpeta **`output/`** dentro del proyecto
+   (`filetomd-main/output/`).
 
 Si un archivo falla (corrupto, sin texto extraíble, formato no soportado), se
 marca como **fallido** con un mensaje claro y **el resto del lote continúa**.
 
 ---
 
-## 🛠️ Instalación manual (opcional, para usuarios técnicos)
+## 🛠️ Para usuarios técnicos (línea de comandos)
 
-Si prefieres gestionar Python tú mismo (necesitas **Python 3.10–3.13**):
+Con Docker instalado, desde la carpeta del proyecto:
 
 ```bash
-# (opcional) clonar con git en vez de descargar el ZIP
+# clonar (opcional) en vez de descargar el ZIP
 git clone https://github.com/luisalfredorojas/filetomd.git
 cd filetomd
 
-# 1. Crear el entorno virtual
-python3 -m venv .venv
+# construir y levantar
+docker compose up --build
 
-# 2. Activarlo
-source .venv/bin/activate          # macOS / Linux
-# .venv\Scripts\Activate.ps1       # Windows (PowerShell)
-
-# 3. Instalar dependencias
-pip install -r requirements.txt
-
-# 4. Levantar la app
-python app.py
+# (en otra terminal) detener
+docker compose down
 ```
 
-> **Nota sobre Python 3.14:** algunas dependencias de `markitdown` aún no
-> publican versiones para Python 3.14. Usa Python 3.10–3.13, o simplemente usa
-> el lanzador (`start.command` / `start.bat` / `start.sh`), que ya provisiona
-> un Python 3.13 compatible automáticamente.
+La app queda en `http://127.0.0.1:5001`. Variables útiles:
+
+| Variable             | Por defecto | Para qué |
+|----------------------|-------------|----------|
+| `HOST_PORT`          | `5001`      | Puerto en tu máquina (cámbialo si está ocupado). |
+| `MAX_FILE_SIZE_MB`   | `50`        | Tamaño máximo por archivo. |
+| `DISPLAY_OUTPUT_DIR` | (auto)      | Ruta del host que se muestra en la interfaz. |
+
+```bash
+HOST_PORT=8080 MAX_FILE_SIZE_MB=100 docker compose up
+```
+
+> **¿Sin Docker?** La app es Flask normal: también puedes crear un entorno con
+> Python 3.10–3.13, `pip install -r requirements.txt` y `python app.py`. Pero la
+> forma recomendada y soportada es Docker.
 
 ---
 
@@ -156,19 +134,20 @@ python app.py
 
 ```
 filetomd/
-├── app.py              # Servidor Flask + endpoints
-├── requirements.txt    # flask + markitdown (extras de documentos)
-├── start.command       # Lanzador macOS (doble clic)
-├── start.sh            # Lanzador terminal (macOS / Linux)
-├── start.bat           # Lanzador Windows (doble clic)
-├── .python-version     # Fija Python 3.13 para uv
+├── app.py                # Servidor Flask + endpoints
+├── requirements.txt      # flask + markitdown (extras de documentos)
+├── Dockerfile            # Imagen de la app (Python 3.13)
+├── docker-compose.yml    # Orquestación: puerto, carpeta de salida, etc.
+├── .dockerignore
+├── start.command         # Lanzador Mac (doble clic) → usa Docker
+├── start.sh              # Lanzador terminal (macOS / Linux) → usa Docker
+├── start.bat             # Lanzador Windows (doble clic) → usa Docker
 ├── templates/
-│   └── index.html      # Interfaz + estilos embebidos (modo claro, responsive)
+│   └── index.html        # Interfaz + estilos embebidos (modo claro, responsive)
 ├── static/
-│   └── app.js          # Lógica frontend (fetch/AJAX, drag & drop, preview)
-├── output/             # Aquí se guardan los .md generados
-├── uploads/            # Archivos subidos temporalmente (se limpian solos)
-├── .venv/              # Entorno virtual (se crea automáticamente)
+│   └── app.js            # Lógica frontend (fetch/AJAX, drag & drop, preview)
+├── output/               # Aquí aparecen tus .md (carpeta montada en el contenedor)
+├── uploads/              # Temporales dentro del contenedor (se limpian solos)
 └── README.md
 ```
 
@@ -208,22 +187,10 @@ filetomd/
   caracteres problemáticos.
 - **Validación de formato**: se validan las extensiones soportadas antes de
   intentar convertir.
-- **Tamaño máximo**: 50 MB por archivo por defecto. Configurable con la variable
-  de entorno `MAX_FILE_SIZE_MB`:
-
-  ```bash
-  MAX_FILE_SIZE_MB=100 ./start.sh
-  ```
-
-- **Puerto**: la app **elige sola** un puerto libre (empezando por el 5000 y
-  subiendo) y abre el navegador en él, así que normalmente no tienes que hacer
-  nada. Si quieres forzar uno concreto, usa `PORT`:
-
-  ```bash
-  PORT=8080 ./start.sh
-  ```
-
-- **Limpieza**: los archivos temporales en `uploads/` se eliminan tras convertir.
+- **Tamaño máximo**: 50 MB por archivo por defecto (`MAX_FILE_SIZE_MB`).
+- **Dónde quedan los `.md`**: en `output/` dentro de la carpeta del proyecto
+  (esa carpeta se "monta" en el contenedor, por eso los ves en tu máquina).
+- **Limpieza**: los archivos temporales de subida se eliminan tras convertir.
 
 ---
 
@@ -243,24 +210,25 @@ TIFF, WEBP).
 
 ## Solución de problemas
 
-- **Sale "Access to 127.0.0.1 was denied / HTTP ERROR 403"** → es el "Receptor
-  de AirPlay" de macOS ocupando el puerto 5000. La app ya lo evita sola usando
-  otro puerto; mira en la ventana negra la línea *"Abre: http://127.0.0.1:…"* y
-  usa esa dirección. (También puedes desactivar el receptor en **Ajustes del
-  Sistema → General → AirDrop y Handoff → Receptor de AirPlay**.)
-- **No abre el navegador solo** → mira la dirección *"Abre: http://127.0.0.1:…"*
+- **"No encuentro Docker" / la ventana se cierra pidiendo instalar Docker** →
+  instala **Docker Desktop** (Paso 1) y ábrelo antes de lanzar la app.
+- **"Docker no está activo"** → abre **Docker Desktop** y espera a que el ícono
+  de la ballena diga **"running"**; luego vuelve a abrir `start.command`.
+- **La primera vez tarda mucho** → es normal: Docker está descargando y
+  preparando la app. Solo pasa una vez.
+- **No abre el navegador solo** → mira la dirección *"Abriendo http://127.0.0.1:…"*
   en la ventana negra y escríbela en tu navegador.
 - **Un PDF no genera texto** → puede ser un PDF escaneado (solo imágenes) sin
   capa de texto; no hay texto que extraer.
-- **macOS dice que "no pudo verificar que está libre de malware"** (botones
-  *Mover a la papelera / Listo*) → pulsa **Listo**, ve a **Ajustes del Sistema →
-  Privacidad y seguridad**, baja y pulsa **"Abrir igualmente"**; luego vuelve a
-  abrir `start.command`. (Atajo en Terminal:
-  `xattr -dr com.apple.quarantine ~/Downloads/filetomd-main`). Solo la 1ª vez.
+- **macOS: "no pudo verificar que está libre de malware"** → pulsa **Listo**,
+  ve a **Ajustes del Sistema → Privacidad y seguridad → "Abrir igualmente"** y
+  vuelve a abrir `start.command`. (Atajo: `xattr -dr com.apple.quarantine
+  ~/Downloads/filetomd-main`.) Solo la 1ª vez.
 
 ---
 
 ## Privacidad
 
-Todo ocurre en tu máquina. Los archivos **no salen de tu equipo**: no hay
+Todo ocurre en tu máquina. La app escucha solo en `127.0.0.1` (no se expone a la
+red local ni a internet) y los archivos **no salen de tu equipo**: no hay
 llamadas a servicios externos ni API keys.

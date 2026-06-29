@@ -1,0 +1,20 @@
+services:
+  filetomd:
+    build: .
+    container_name: filetomd
+    ports:
+      # Solo accesible desde TU máquina (127.0.0.1), no desde la red local.
+      # HOST_PORT lo fija el lanzador (busca un puerto libre); por defecto 5001
+      # porque en Mac el 5000 lo ocupa el Receptor de AirPlay.
+      - "127.0.0.1:${HOST_PORT:-5001}:5000"
+    environment:
+      # DISPLAY_OUTPUT_DIR = ruta REAL en tu máquina donde aparecen los .md,
+      # para que la interfaz muestre la ruta correcta (no la del contenedor).
+      - DISPLAY_OUTPUT_DIR=${DISPLAY_OUTPUT_DIR:-}
+      - MAX_FILE_SIZE_MB=${MAX_FILE_SIZE_MB:-50}
+    volumes:
+      # Los .md generados se guardan en la carpeta ./output de tu máquina.
+      - ./output:/app/output
+    # Sin política de reinicio: la app es de escritorio, se detiene al cerrar la
+    # ventana del lanzador (no debe quedar viva en segundo plano).
+    restart: "no"
